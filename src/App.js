@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {lazy, Suspense} from 'react';
 import { BrowserRouter as Router, Route, Link, Switch, Redirect, withRouter } from "react-router-dom";
 import {connect} from 'react-redux';
 import './App.css';
@@ -8,14 +8,16 @@ import {selectCurrentUser} from './redux/user/user.selector';
 
 
 
-import HomePage from './pages/homepage/homepage.component';
-import ShopPage from './pages/shop/shop.component.jsx';
-import SignInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component';
 import Header from './components/header/header.component';
 import {auth, createUserProfileDocument} from './firebase/firebase.utils';
 import {setCurrentUser} from './redux/user/user.actions';
 
-import CheckoutPage from './pages/checkout/checkout.component';
+
+const HomePage = lazy(() => import('./pages/homepage/homepage.component'))
+const ShopPage = lazy(() => import('./pages/shop/shop.component.jsx'))
+const SignInAndSignUpPage = lazy(() => import('./pages/sign-in-and-sign-up/sign-in-and-sign-up.component'))
+const CheckoutPage = lazy(() => import('./pages/checkout/checkout.component'))
+const ImagesPage = lazy(() => import('./pages/images/imagespage.component'))
 
 class App extends React.Component {
 
@@ -23,6 +25,8 @@ class App extends React.Component {
   unsubscribeFromAuth = null;
 
   componentDidMount(){
+ 
+    
     const {setCurrentUser} = this.props;
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth =>{
       if(userAuth){
@@ -38,7 +42,8 @@ class App extends React.Component {
   
       }
       console.log(userAuth);
-      setCurrentUser(userAuth);   
+      setCurrentUser(userAuth); 
+     
     })
   }
 
@@ -50,14 +55,18 @@ class App extends React.Component {
     return(<div>
       <Header />
       <Switch>
-        <Route exact path = '/' component={HomePage} />
-        <Route  path = '/shop' component={ShopPage} />
-        <Route exact path = '/checkout' component={CheckoutPage} />
+        <Suspense fallback={<div>..loading</div>}>
+          <Route exact path = '/' component={HomePage} />
+          <Route exact path = '/images' component={ImagesPage} />
+          <Route  path = '/shop' component={ShopPage} />
+          <Route exact path = '/checkout' component={CheckoutPage} />
+          
 
-        <Route  path = '/signin' render={() => this.props.currentUser ? 
-                                        (<Redirect to = '/' />) :
-                                        (<SignInAndSignUpPage />)} 
-        />
+          <Route  path = '/signin' render={() => this.props.currentUser ? 
+                                          (<Redirect to = '/' />) :
+                                          (<SignInAndSignUpPage />)} 
+          />
+        </Suspense>
       </Switch>
     </div>
     )

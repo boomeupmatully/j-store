@@ -2,8 +2,15 @@ import {combineReducers} from 'redux';
 
 import userReducer from './user/user.reducer';
 import cartReducer from './cart/cart.reducer';
+import directoryReducer from './directory/directory.reducer';
+import shopReducer from './shop/shop.reducer';
+import imagesReducer from './images/images.reducer';
+
 
 export default combineReducers({
     user: userReducer,
-    cart: cartReducer
+    cart: cartReducer,
+    directory: directoryReducer,
+    shop: shopReducer,
+    images: imagesReducer
 });
